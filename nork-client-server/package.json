@@ -1,0 +1,16 @@
+{
+  "name": "nork-client-server",
+  "version": "1.0.0",
+  "description": "Nork client server by Lit and Jordan",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Nork",
+    "Client",
+    "Server"
+  ],
+  "author": "Jordan Muno and Lit Phansiri",
+  "license": "ISC"
+}

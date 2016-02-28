@@ -1,0 +1,22 @@
+{
+  "name": "arch-nork",
+  "version": "1.0.0",
+  "description": "arch-nork assignment from Lit and Jordan",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phansiri/arch-nork.git"
+  },
+  "keywords": [
+    "Nork"
+  ],
+  "author": "Lit Phansiri and Jordan Mundo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phansiri/arch-nork/issues"
+  },
+  "homepage": "https://github.com/phansiri/arch-nork#readme"
+}
