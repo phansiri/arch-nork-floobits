@@ -27,17 +27,12 @@ client.on('end', function() {
 	console.log('');
 });
 
+//close the connection
 client.on('close', function() { //when connection closed
     console.log('Connection closed');
 });
 
-
-//var HOST = '127.0.0.1';
-//var PORT = 3000;
 //connect to the server
 client.connect(_.PORT, _.HOST, function() {
     console.log('Connected to: ' + _.HOST + ' : ' + _.PORT + '\n');
-
-    //send message to server
-    //client.write("Hello server, I'm the client!");
 });

@@ -11,7 +11,7 @@ class Inventory {
 
     // fencepost way of concatenating the list of items together and returns it
     inventoryList(inventoryItem) {
-        if (inventoryItem.length === 0) {
+        if (inventoryItem.length === 0 || inventoryItem === undefined) {
             return "empty";
         } else {
             var result = inventoryItem[0];
@@ -42,28 +42,32 @@ class Inventory {
             callback(undefined); //'you have no items to use';
         } else {
             if (room.uses[0]) { // if room.uses exist in obj
-                console.log('room.uses[0] exists');
-                for (let useIndex = 0; useIndex < room.uses.length; useIndex++) {
-                    if (room.uses[useIndex].item === item) {
-                        console.log(`${item} can be used in ${room.id}`);
-                        console.log(`${room.uses[useIndex].effect.consumed}`);
-                        if (room.uses[useIndex].effect.consumed !== true) {
-                            room.uses[useIndex].effect.consumed = true;
-                            console.log(`consumed? ${room.uses[useIndex].effect.consumed}`);
-                            callback(room.uses[useIndex].item);
+                //console.log('room.uses[0] exists');
+                if (room.uses[0].effect.consumed === false) {
+                    for (let useIndex = 0; useIndex < room.uses.length; useIndex++) {
+                        if (room.uses[useIndex].item === item) {
+                            //console.log(`${item} can be used in ${room.id}`);
+                            //console.log(`${room.uses[useIndex].effect.consumed}`);
+                            if (room.uses[useIndex].effect.consumed !== true) {
+                                //room.uses[useIndex].effect.consumed = true;
+                                //console.log(`consumed? ${room.uses[useIndex].effect.consumed}`);
+                                callback(room.uses[useIndex].item);
+                            } else {
+                                //console.log('has been used already');
+                                callback(undefined);
+                            }
+                            // room[useIndex].consumed = true; //finds out if the use has already been done (needs access to world object)
+                            // send item back so that it can be removed from the inventory
+                            // send the modified world back to set the global world object
                         } else {
-                            console.log('has been used already');
                             callback(undefined);
                         }
-                        // room[useIndex].consumed = true; //finds out if the use has already been done (needs access to world object)
-                        // send item back so that it can be removed from the inventory
-                        // send the modified world back to set the global world object
-                    } else {
-                        callback(undefined);
                     }
+                } else {
+                    callback(undefined);
                 }
             } else {
-                console.log('room.uses[0] does not exists');
+                //console.log('room.uses[0] does not exists');
                 callback(undefined);
             }
         }

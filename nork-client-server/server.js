@@ -36,7 +36,6 @@ server.on('connection', function(socket) {
     socket.write(curRoom.description + '\n');
 
     /* when a socket is connected... */
-
     //notify on data received event
     socket.on('data', function(data) {
         socket.on('disconnect', function(){
@@ -46,22 +45,30 @@ server.on('connection', function(socket) {
         //process data
         var echo = data.toString().toLowerCase();
 
-        if(echo === 'EXIT') { // have to type "go exit"
+        if(echo === 'exit') {
             socket.write("Goodbye!");
-            socket.end;
+            socket.end('');
         } else {
            curRoom = promptUser(socket, curRoom, echo, inventoryItem);
 
            if(curRoom === undefined) {
-                socket.end;
+                socket.end('');
            }
+        }
+        // ends the game if room id is won
+        if (curRoom.id === 'won') {
+            //console.log('inside won status');
+            socket.write('Great job! #YOLO');
+            socket.end('');
+        } else {
+            //console.log('outside won status');
         }
     });
 
     socket.on('error', function() { console.log("User disconnected abruptly"); });
 
     // close the connection
-    socket.end;
+    //socket.end('');
 });
 
 function promptUser(socket, curRoom, response, inventoryItem){
@@ -94,11 +101,12 @@ function promptUser(socket, curRoom, response, inventoryItem){
         //console.log(curRoom);
         inventory.useItem(splitAction[1], curRoom, inventoryItem, function(item) {
             if (item !== undefined) {
-                socket.write(`Using one time use item ${item}...\n`);
-                socket.write(curRoom.uses[0].description);
-                inventoryItem = inventory.removeItem(inventoryItem, item);
+                socket.write(`Using one time use item ${item}...${curRoom.uses[0].description}`);
                 curRoom = navigator.resolveRoom(curRoom.uses[0].effect.goto);
                 socket.write(curRoom.description + '\n');
+                //console.log(inventoryItem);
+                //inventoryItem = inventory.removeItem(inventoryItem, item);
+                //console.log(inventoryItem);
                 return curRoom;
             } else {
                 socket.write(`Could not use ${splitAction[1]} in ${curRoom.id.replace('_', ' ')}.\n`)
