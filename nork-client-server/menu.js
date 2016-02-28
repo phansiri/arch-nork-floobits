@@ -24,12 +24,16 @@ class Inventory {
 
     // takes the specific item specified from the user
     takeItem(room, item, callback) {
-        for (let i = 0; i < room.items.length; i++) {
-            if (item === room.items[i]) {
-                callback(room.items[i]);
-            } else {
-                callback(undefined);
+        if (room.items) {
+            for (let i = 0; i < room.items.length; i++) {
+                if (item === room.items[i]) {
+                    callback(room.items[i]);
+                } else {
+                    callback(undefined);
+                }
             }
+        } else {
+            callback(undefined);
         }
     }
 

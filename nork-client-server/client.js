@@ -17,13 +17,14 @@ let io = readline.createInterface({ //call the interface "io"
 var client = new net.Socket();
 
 client.on('data', function(data) { //when we get data
-	console.log('' + data, 'game-over');
-	if('' + data !== 'game-over') {
-		console.log('' + data);
-	    io.question('What do you want to do? ', function(response) { // prompts user for a response
-	    	client.write(response); // send response to server
-	    });
-	}
+	console.log('' + data);
+    io.question('What do you want to do? ', function(response) { // prompts user for a response
+    	client.write(response); // send response to server
+    });
+});
+
+client.on('end', function() {
+	console.log('');
 });
 
 client.on('close', function() { //when connection closed

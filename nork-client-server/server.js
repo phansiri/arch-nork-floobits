@@ -33,7 +33,7 @@ server.on('connection', function(socket) {
     socket.write('To check your inventory use the command "INVENTORY"\n');
     socket.write('You can find the list of commands at any time by typing "HELP"\n\n');
 
-    socket.write(navigator.getDescription(curRoom));
+    socket.write(curRoom.description + '\n');
 
     /* when a socket is connected... */
 
@@ -49,13 +49,12 @@ server.on('connection', function(socket) {
         if(echo === 'EXIT') { // have to type "go exit"
             socket.write("Goodbye!");
             socket.end;
-        } else if(echo === 'GAMEOVER') {
-            curRoom ==
-        }
-        else {
+        } else {
            curRoom = promptUser(socket, curRoom, echo, inventoryItem);
 
-            //console.log(curRoom);
+           if(curRoom === undefined) {
+                socket.end;
+           }
         }
     });
 
@@ -74,16 +73,14 @@ function promptUser(socket, curRoom, response, inventoryItem){
             // I added this because the world would not save the new room
             curRoom = room;
 
-            if(room.status != undefined) {
+            if(room.status !== undefined) {
                 socket.write('You ' + room.status + '!\n');
-                socket.write('game-over');
                 return undefined;
             } else {
                 return curRoom;
             }
         });
     } else if (splitAction[0] === 'take') {
-        //console.log(curRoom);
         inventory.takeItem(curRoom, splitAction[1], function(itemFound) {
             if (itemFound !== undefined) {
                 inventoryItem.push(itemFound);
@@ -94,21 +91,18 @@ function promptUser(socket, curRoom, response, inventoryItem){
             }
         });
     } else if (splitAction[0] === 'use') {
-        console.log(curRoom);
+        //console.log(curRoom);
         inventory.useItem(splitAction[1], curRoom, inventoryItem, function(item) {
             if (item !== undefined) {
                 socket.write(`Using one time use item ${item}...\n`);
                 socket.write(curRoom.uses[0].description);
                 inventoryItem = inventory.removeItem(inventoryItem, item);
-
-                // need to update world...
-                return curRoom = promptUser(socket, curRoom, `go ${curRoom.uses[0].effect.goto}`, inventoryItem);
-                //console.log(curRoom);
-
+                curRoom = navigator.resolveRoom(curRoom.uses[0].effect.goto);
+                socket.write(curRoom.description + '\n');
+                return curRoom;
             } else {
                 socket.write(`Could not use ${splitAction[1]} in ${curRoom.id.replace('_', ' ')}.\n`)
             }
-            //socket.write('inside use\n');
         });
     } else if (splitAction[0] === 'inventory') {
         socket.write('Inventory: ' + inventory.inventoryList(inventoryItem) + '\n');
