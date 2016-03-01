@@ -39,35 +39,17 @@ class Inventory {
     }
 
     useItem(item, room, inventoryItem, callback) {
-        if (inventoryItem.length === 0) {
-            callback(undefined); //'you have no items to use';
-        } else {
-            if (room.uses[0]) { // if room.uses exist in obj
-                if (room.uses[0].effect.consumed === false) {
-                    for (let useIndex = 0; useIndex < room.uses.length; useIndex++) {
-                        if (room.uses[useIndex].item === item) {
-                            if (room.uses[useIndex].effect.consumed !== true) {
-                                room.uses[useIndex].effect.consumed = true;
-                                //console.log(`consumed? ${room.uses[useIndex].effect.consumed}`);
-                                callback(room.uses[useIndex].item);
-                            } else {
-                                //console.log('has been used already');
-                                callback(undefined);
-                            }
-                            // room[useIndex].consumed = true; //finds out if the use has already been done (needs access to world object)
-                            // send item back so that it can be removed from the inventory
-                            // send the modified world back to set the global world object
-                        } else {
-                            callback(undefined);
-                        }
-                    }
+        if (inventoryItem.length !== 0 && room.uses[0] && room.uses[0].effect.consumed === false) { // if room.uses exist in obj
+            for (let useIndex = 0; useIndex < room.uses.length; useIndex++) {
+                if (room.uses[useIndex].item === item && room.uses[useIndex].effect.consumed !== true) {
+                    room.uses[useIndex].effect.consumed = true;
+                    callback(room.uses[useIndex].item); //item is used
                 } else {
-                    callback(undefined);
+                    callback(undefined); //item cannot be used here
                 }
-            } else {
-                //console.log('room.uses[0] does not exists');
-                callback(undefined);
             }
+        } else {
+            callback(undefined); //item does not exist or has already been used
         }
     }
 
