@@ -28,6 +28,7 @@ class Inventory {
             for (let i = 0; i < room.items.length; i++) {
                 if (item === room.items[i]) {
                     callback(room.items[i]);
+                    room.items[i] = undefined;
                 } else {
                     callback(undefined);
                 }
@@ -42,14 +43,11 @@ class Inventory {
             callback(undefined); //'you have no items to use';
         } else {
             if (room.uses[0]) { // if room.uses exist in obj
-                //console.log('room.uses[0] exists');
                 if (room.uses[0].effect.consumed === false) {
                     for (let useIndex = 0; useIndex < room.uses.length; useIndex++) {
                         if (room.uses[useIndex].item === item) {
-                            //console.log(`${item} can be used in ${room.id}`);
-                            //console.log(`${room.uses[useIndex].effect.consumed}`);
                             if (room.uses[useIndex].effect.consumed !== true) {
-                                //room.uses[useIndex].effect.consumed = true;
+                                room.uses[useIndex].effect.consumed = true;
                                 //console.log(`consumed? ${room.uses[useIndex].effect.consumed}`);
                                 callback(room.uses[useIndex].item);
                             } else {
@@ -73,7 +71,6 @@ class Inventory {
         }
     }
 
-    //this method take the item from the inventoryItem once you use it.  this is different from take item where it takes it from the world
     removeItem(inventoryItem, item) {
         let result = [];
         for (let i = 0; i < inventoryItem.length; i++) {

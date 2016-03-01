@@ -17,10 +17,15 @@ let io = readline.createInterface({ //call the interface "io"
 var client = new net.Socket();
 
 client.on('data', function(data) { //when we get data
-	console.log('' + data);
-    io.question('What do you want to do? ', function(response) { // prompts user for a response
-    	client.write(response); // send response to server
-    });
+    let message = JSON.parse('' + data);
+
+    console.log(message.text);
+
+    if(message.prompt) {
+    	io.question('What do you want to do? ', function(response) { // prompts user for a response
+	    	client.write(response); // send response to server
+	    })
+    }
 });
 
 client.on('end', function() {

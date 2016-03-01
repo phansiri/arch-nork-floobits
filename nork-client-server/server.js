@@ -26,14 +26,14 @@ server.on('connection', function(socket) {
     console.log('User Connected');
 
     // intro for connecting user
-    socket.write('Welcome to NORK -- A Text Based Adventure Game!\n');
-    socket.write('To Navigate to a different room use the command "GO"\n');
-    socket.write('To take an item use the command "TAKE"\n');
-    socket.write('To use and item use the command "USE"\n');
-    socket.write('To check your inventory use the command "INVENTORY"\n');
-    socket.write('You can find the list of commands at any time by typing "HELP"\n\n');
+    //socket.write(messageToJSON('Welcome to NORK -- A Text Based Adventure Game!\n', false));
+    //socket.write(messageToJSON('To Navigate to a different room use the command "GO"\n', false));
+    //socket.write(messageToJSON('To take an item use the command "TAKE"\n', false));
+    //socket.write(messageToJSON('To use and item use the command "USE"\n', false));
+    //socket.write(messageToJSON('To check your inventory use the command "INVENTORY"\n', false));
+    //socket.write(messageToJSON('You can find the list of commands at any time by typing "HELP"\n\n', false));
 
-    socket.write(curRoom.description + '\n');
+    socket.write(messageToJSON(curRoom.description + '\n', true));
 
     /* when a socket is connected... */
     //notify on data received event
@@ -45,82 +45,87 @@ server.on('connection', function(socket) {
         //process data
         var echo = data.toString().toLowerCase();
 
+
         if(echo === 'exit') {
             socket.write("Goodbye!");
             socket.end('');
         } else {
-           curRoom = promptUser(socket, curRoom, echo, inventoryItem);
+           promptUser(socket, curRoom, echo, inventoryItem, function(room, inv, message) {
+               //console.log(message);
+                // ends the game if room status is defined
+               if(message !== undefined) {
+                   //console.log(message);
+                   curRoom = room;
+                   inventoryItem = inv;
+                   if (curRoom.status !== undefined) {
+                       //console.log( `inside you...`)
+                       //console.log(`status is not equal to undefined`);
+                       socket.end(messageToJSON(message + '\n\nYou ' + curRoom.status + '!\n', false));
+                   } else {
+                       //console.log(`status is equal to undefined.`);
+                       socket.write(messageToJSON(message + '\n', true));
 
-           if(curRoom === undefined) {
-                socket.end('');
-           }
-        }
-        // ends the game if room id is won
-        if (curRoom.id === 'won') {
-            //console.log('inside won status');
-            socket.write('Great job! #YOLO');
-            socket.end('');
-        } else {
-            //console.log('outside won status');
+                   }
+               }
+           });
         }
     });
 
     socket.on('error', function() { console.log("User disconnected abruptly"); });
-
-    // close the connection
-    //socket.end('');
 });
 
-function promptUser(socket, curRoom, response, inventoryItem){
+function promptUser(socket, curRoom, response, inventoryItem, callback){
     let splitAction = response.split(' ');
 
     if (splitAction[0] === 'go') {
         navigator.goTo(splitAction[1], curRoom, function(room) {
-            socket.write(`\nYou go ${splitAction[1]}` + '...\n\n' + room.description + '\n');
-            // I added this because the world would not save the new room
             curRoom = room;
 
-            if(room.status !== undefined) {
-                socket.write('You ' + room.status + '!\n');
-                return undefined;
-            } else {
-                return curRoom;
-            }
+            callback(curRoom, inventoryItem, `\nYou go ${splitAction[1]}` + '...\n\n' + room.description);
         });
     } else if (splitAction[0] === 'take') {
         inventory.takeItem(curRoom, splitAction[1], function(itemFound) {
             if (itemFound !== undefined) {
                 inventoryItem.push(itemFound);
-                // need to implement a removeItem from the room
-                socket.write(itemFound + ' added to inventory.\n');
+                callback(curRoom, inventoryItem, '\n' + itemFound + ' added to inventory.');
             } else {
-                socket.write('Could not find "' + splitAction[1] + '" in ' + curRoom.id.replace('_', ' ') + '.\n');
+                callback(curRoom, inventoryItem, 'Could not find "' + splitAction[1] + '" in ' + curRoom.id.replace('_', ' ') + '.\n');
             }
         });
     } else if (splitAction[0] === 'use') {
-        //console.log(curRoom);
         inventory.useItem(splitAction[1], curRoom, inventoryItem, function(item) {
             if (item !== undefined) {
-                socket.write(`Using one time use item ${item}...${curRoom.uses[0].description}`);
+                let prevRoom = curRoom;
                 curRoom = navigator.resolveRoom(curRoom.uses[0].effect.goto);
-                socket.write(curRoom.description + '\n');
-                //console.log(inventoryItem);
-                //inventoryItem = inventory.removeItem(inventoryItem, item);
-                //console.log(inventoryItem);
-                return curRoom;
+                //socket.write(messageToJSON(`\nUsing one time use item ${item}...${prevRoom.uses[0].description} ${curRoom.description}`, true));
+                inventoryItem = inventory.removeItem(inventoryItem, item);
+
+                callback(curRoom, inventoryItem, `\nUsing one time use item ${item}...${prevRoom.uses[0].description} ${curRoom.description}`);
             } else {
-                socket.write(`Could not use ${splitAction[1]} in ${curRoom.id.replace('_', ' ')}.\n`)
+                socket.write(messageToJSON(`Could not use ${splitAction[1]} in ${curRoom.id.replace('_', ' ')}.\n`))
             }
         });
     } else if (splitAction[0] === 'inventory') {
-        socket.write('Inventory: ' + inventory.inventoryList(inventoryItem) + '\n');
+        callback(curRoom, inventoryItem, 'Inventory: ' + inventory.inventoryList(inventoryItem) + '\n');
+        //socket.write(messageToJSON('Inventory: ' + inventory.inventoryList(inventoryItem) + '\n', true));
     } else if (splitAction[0] === 'help') {
-        socket.write('Commands: "GO", "TAKE", "USE", "INVENTORY"\n');
+        //socket.write('Commands: "GO", "TAKE", "USE", "INVENTORY"\n');
+
+        callback(curRoom, inventoryItem, 'Commands: "GO", "TAKE", "USE", "INVENTORY"\n');
+        //socket.write(messageToJSON('Commands: "GO", "TAKE", "USE", "INVENTORY"\n', true));
     } else {
-        socket.write('Command not recognized...\n');
+        callback(curRoom, inventoryItem, 'Command not recognized...\n');
+        //socket.write('Command not recognized...\n');
     }
 
-    return curRoom;
+    callback(curRoom, inventoryItem);
+}
+
+function messageToJSON(text, prompt) {
+    var jsonData = {};
+    jsonData.prompt = prompt;
+    jsonData.text = text;
+    return JSON.stringify(jsonData);
 }
 
 //when we start "listening" for connections

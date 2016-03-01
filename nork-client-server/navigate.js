@@ -11,10 +11,12 @@ class Navigator {
 		let targetRoom;
 
 		// defines the current and target rooms and saves into variables
-		if(curRoom.exits[direction] !== undefined){
-			//targetRoom = resolveRoom(this, curRoom.exits[direction].id);
-
-			targetRoom = this.resolveRoom(curRoom.exits[direction].id);
+		if(curRoom !== null) {
+			if(curRoom.exits !== undefined) {
+				if (curRoom.exits[direction] !== undefined) {
+					targetRoom = this.resolveRoom(curRoom.exits[direction].id);
+				}
+			}
 		}
 
 		if(targetRoom !== undefined){
