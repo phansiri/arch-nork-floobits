@@ -4,6 +4,7 @@
 
 'use strict';
 
+//dependencies
 let net = require('net');
 let readline = require('readline');
 let _ = require('./../common/common.js');
@@ -16,6 +17,7 @@ let io = readline.createInterface({ //call the interface "io"
 //make the client
 var client = new net.Socket();
 
+//Initially starts the game logic
 client.on('data', function(data) { //when we get data
     let message = JSON.parse('' + data);
 
@@ -28,6 +30,7 @@ client.on('data', function(data) { //when we get data
     }
 });
 
+//ends the connection
 client.on('end', function() {
 	console.log('');
 });

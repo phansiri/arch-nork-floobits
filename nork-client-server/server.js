@@ -104,6 +104,12 @@ function promptUser(socket, curRoom, response, inventoryItem, callback){
     }
 }
 
+/**
+ * crjesraoingstb anset es a
+ * @param {string} direction - which way the player would like to go on the map.
+ * @param {object} curRoom - object version of the room the player is currently in.
+ * @callback sends back current room.
+ */
 function messageToJSON(text, prompt) {
     var jsonData = {};
     jsonData.prompt = prompt;

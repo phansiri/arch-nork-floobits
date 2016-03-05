@@ -9,7 +9,7 @@ const menu = require('../common/menu.js');
 class GameManager extends EventEmitter {}
 class Player extends EventEmitter {}
 
-let gameManager = new GameManager();
+let gameManager = new GameManager(); // creating game manager event emmitter
 let navigator = new nav.Navigator('../common/world.json'); //Initialize world and navigation functionality
 let inventory = new menu.Inventory(); //Initializes new inventory manager.
 
@@ -22,7 +22,7 @@ let io = readline.createInterface({ //call the interface "io"
     output: process.stdout //output goes to the terminal ("standard out")
 });
 
-//player listening for game managers response
+//manager listening for response to prompt the user for another command
 gameManager.on('prompt', function(text, prompt) {
     console.log(text + '\n'); // print game description
 
@@ -33,20 +33,18 @@ gameManager.on('prompt', function(text, prompt) {
     }
 });
 
-//game manager listening for players response
+//game manager listening for user response
 gameManager.on('response', function(response) {
 	let splitAction = response.split(' ');
 
     if (splitAction[0] === 'go') {
         navigator.goTo(splitAction[1], curRoom, function(room) {
             curRoom = room;
-            console.log(curRoom.status);
 
             if(curRoom.status === undefined) {
-				gameManager.emit('prompt', `\nYou go ${splitAction[1]}` + '...\n\n' + room.description, true);
+				gameManager.emit('prompt', `\nYou go ${splitAction[1]}` + '...\n\n' + room.description, true); // still playing
             } else {
-                console.log(`curRoom.status is defined! ${curRoom.status}, game should end`);
-            	gameManager.emit('prompt', `\nYou go ${splitAction[1]}` + '...\n\n' + room.description + '\n\nYou ' + curRoom.status + '!', false);
+            	gameManager.emit('prompt', `\nYou go ${splitAction[1]}` + '...\n\n' + room.description + '\n\nYou ' + curRoom.status + '!', false); // game over
             }
             
         });
@@ -68,23 +66,24 @@ gameManager.on('response', function(response) {
                 inventoryItem = inventory.removeItem(inventoryItem, item);
 
                 if(curRoom.status === undefined) {
-                    gameManager.emit('prompt', `\nUsing one time use item ${item}...${prevRoom.uses[0].description} ${curRoom.description}`, true);
+                    gameManager.emit('prompt', `\nUsing one time use item ${item}...${prevRoom.uses[0].description} ${curRoom.description}`, true); // still playing
                 } else {
-                    gameManager.emit('prompt',  `\nYou go ${splitAction[1]}` + curRoom.status + '!', false);
+                    gameManager.emit('prompt',  `\nYou ${curRoom.status}!`, false); // game over
                 }
             } else {
             	gameManager.emit('prompt', `Could not use ${splitAction[1]} in ${curRoom.id.replace('_', ' ')}.\n`, true);
             }
         });
     } else if (splitAction[0] === 'inventory') {
-    	gameManager.emit('prompt', '\nInventory: ' + inventory.inventoryList(inventoryItem) + '\n', true);
+    	gameManager.emit('prompt', '\nInventory: ' + inventory.inventoryList(inventoryItem) + '\n', true); // lists out the current inventory
     } else if (splitAction[0] === 'help') {
-    	gameManager.emit('prompt', 'Commands: "GO", "TAKE", "USE", "INVENTORY"\n', true);
+    	gameManager.emit('prompt', 'Commands: "GO", "TAKE", "USE", "INVENTORY"\n', true); // shows help menu
     } else {
-    	gameManager.emit('prompt', 'Command not recognized...\n', true);
+    	gameManager.emit('prompt', 'Command not recognized...\n', true); //command not found
     }
 });
 
+// emits the first message to start the game
 gameManager.emit('prompt', 'Welcome to NORK -- A Text Based Adventure Game!\n' +
         'To Navigate to a different room use the command "GO"\nTo take an item use the command "TAKE"\n' +
         'To use and item use the command "USE"\nTo check your inventory use the command "INVENTORY"\n' +

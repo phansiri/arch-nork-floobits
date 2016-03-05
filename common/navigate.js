@@ -53,7 +53,10 @@ class Navigator {
 	}
 }
 
-//Function exports for this module.
+/**
+ * Exports the class Navigator
+ * @type {object} Navigator - Navigation commands besides inventory
+ */
 module.exports.Navigator = Navigator;
 
 
