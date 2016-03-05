@@ -52,7 +52,7 @@ server.on('connection', function(socket) {
                     inventoryItem = inv;
 
                     if (curRoom.status !== undefined) {
-                       socket.end(messageToJSON(message + '\n\nYou ' + curRoom.status + '!', false));
+                       socket.end(messageToJSON(message + '\n\nYou ' + curRoom.status + '!', false)); // game o
                     } else {
                        socket.write(messageToJSON(message + '\n', true));
                     }
@@ -64,7 +64,14 @@ server.on('connection', function(socket) {
     socket.on('error', function() { console.log("User disconnected abruptly"); });
 });
 
-function promptUser(socket, curRoom, response, inventoryItem, callback){
+/**
+ * moves the player to the requested room based on a direction.
+ * @param {object} curRoom - current room the user is in
+ * @param {string} response - players response to the prompt
+ * @param {array} inventoryItem - current player's inventory
+ * @callback sends back current room, inventory, and a message to the user
+ */
+function promptUser(curRoom, response, inventoryItem, callback){
     let splitAction = response.split(' ');
 
     if (splitAction[0] === 'go') {
@@ -105,10 +112,10 @@ function promptUser(socket, curRoom, response, inventoryItem, callback){
 }
 
 /**
- * crjesraoingstb anset es a
- * @param {string} direction - which way the player would like to go on the map.
- * @param {object} curRoom - object version of the room the player is currently in.
- * @callback sends back current room.
+ * creates a json string to send over the socket.
+ * @param {string} text - message to be sent to the player
+ * @param {boolean} prompt - should the user be prompted for another response.
+ * @return stringified json
  */
 function messageToJSON(text, prompt) {
     var jsonData = {};
