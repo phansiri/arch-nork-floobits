@@ -7,8 +7,8 @@
 // dependencies
 let net = require('net'); //import socket module
 let _ = require('./../common/common.js');
-let nav = require('./navigate.js');
-let menu = require('./menu.js');
+let nav = require('../common/navigate.js');
+let menu = require('../common/menu.js');
 
 // instance Variables
 let server = net.createServer(); //create socket server
