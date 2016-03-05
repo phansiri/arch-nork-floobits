@@ -45,16 +45,16 @@ server.on('connection', function(socket) {
             socket.write("Goodbye!");
             socket.end('');
         } else {
-            promptUser(socket, curRoom, echo, inventoryItem, function(room, inv, message) {
+            promptUser(curRoom, echo, inventoryItem, function(room, inv, message) {
                 // ends the game if room status is defined
                 if(message !== undefined) {
                     curRoom = room;
                     inventoryItem = inv;
 
                     if (curRoom.status !== undefined) {
-                       socket.end(messageToJSON(message + '\n\nYou ' + curRoom.status + '!', false)); // game o
+                       socket.end(messageToJSON(message + '\n\nYou ' + curRoom.status + '!', false)); // game over
                     } else {
-                       socket.write(messageToJSON(message + '\n', true));
+                       socket.write(messageToJSON(message + '\n', true)); // still playing
                     }
                 }
             });

@@ -87,4 +87,4 @@ gameManager.on('response', function(response) {
 gameManager.emit('prompt', 'Welcome to NORK -- A Text Based Adventure Game!\n' +
         'To Navigate to a different room use the command "GO"\nTo take an item use the command "TAKE"\n' +
         'To use and item use the command "USE"\nTo check your inventory use the command "INVENTORY"\n' +
-        'You can find the list of commands at any time by typing "HELP"\n\n' +curRoom.description, true); //start game*/
+        'You can find the list of commands at any time by typing "HELP"\n\n' +curRoom.description, true); //start game
