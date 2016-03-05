@@ -40,10 +40,12 @@ gameManager.on('response', function(response) {
     if (splitAction[0] === 'go') {
         navigator.goTo(splitAction[1], curRoom, function(room) {
             curRoom = room;
+            console.log(curRoom.status);
 
             if(curRoom.status === undefined) {
 				gameManager.emit('prompt', `\nYou go ${splitAction[1]}` + '...\n\n' + room.description, true);
             } else {
+                console.log(`curRoom.status is defined! ${curRoom.status}, game should end`);
             	gameManager.emit('prompt', `\nYou go ${splitAction[1]}` + '...\n\n' + room.description + '\n\nYou ' + curRoom.status + '!', false);
             }
             
@@ -65,7 +67,11 @@ gameManager.on('response', function(response) {
                 curRoom = navigator.resolveRoom(curRoom.uses[0].effect.goto);
                 inventoryItem = inventory.removeItem(inventoryItem, item);
 
-                gameManager.emit('prompt', `\nUsing one time use item ${item}...${prevRoom.uses[0].description} ${curRoom.description}`, true);
+                if(curRoom.status === undefined) {
+                    gameManager.emit('prompt', `\nUsing one time use item ${item}...${prevRoom.uses[0].description} ${curRoom.description}`, true);
+                } else {
+                    gameManager.emit('prompt',  `\nYou go ${splitAction[1]}` + curRoom.status + '!', false);
+                }
             } else {
             	gameManager.emit('prompt', `Could not use ${splitAction[1]} in ${curRoom.id.replace('_', ' ')}.\n`, true);
             }
